@@ -1,6 +1,6 @@
-# Paseo registry submission
+# Paseo registry listing and updates
 
-The maintainer will submit this plugin after publishing and checking the public source. Preparing these files does not create a registry listing or imply approval.
+Workspace Ports is published in the [Paseo plugin store](https://paseo.sh/plugins/maneeshv/workspace-ports). The notes below apply to future listing and version updates.
 
 Use Paseo's [submission form](https://github.com/getpaseo/plugins/issues/new?template=submit-plugin.yml), which applies the label required for intake. The [publishing guide](https://paseo.sh/docs/plugins/publishing) and [registry review policy](https://github.com/getpaseo/plugins/blob/main/REVIEW.md) define the current process.
 
@@ -20,14 +20,14 @@ The form currently asks for Source and Categories; the title is the issue title.
 
 - [Overview](../OVERVIEW.md): shipped listing text describing behavior, setup, data access, and limits.
 - [Interface screenshot](../assets/screenshot.png): current panel with sample data; declared in the manifest.
-- Public screenshot URL after push: `https://raw.githubusercontent.com/maneeshv/paseo-workspace-ports/main/assets/screenshot.png`.
+- Public screenshot URL: `https://raw.githubusercontent.com/maneeshv/paseo-workspace-ports/main/assets/screenshot.png`.
 - [README](../README.md): setup and development instructions.
 - [Verification](verification.md): completed checks and remaining limits.
 - [Security policy](../SECURITY.md) and [MIT license](../LICENSE).
 
 Use the actual interface screenshot as registry media. The architecture diagram explains the design but is not a substitute for interface media.
 
-## Before submitting
+## Before submitting an update
 
 1. Confirm the public repository and screenshot URL are accessible and the intended commit is pushed.
 2. Verify the committed manifest, runtime entries, imported modules, lockfile, overview, and media are present.

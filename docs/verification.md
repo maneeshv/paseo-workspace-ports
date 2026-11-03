@@ -18,6 +18,8 @@ Target: Workspace Ports 0.1.0 with Paseo Desktop and daemons 0.14.0 on macOS. Th
 
 ## Public release checks
 
+Workspace Ports is [published in the Paseo plugin store](https://paseo.sh/plugins/maneeshv/workspace-ports); listing availability was verified on 2026-11-04.
+
 - A clean Git installation of commit [`57a3cc5`](https://github.com/maneeshv/paseo-workspace-ports/commit/57a3cc5abe79449ecc10d0a40e845541deedb813) passed in a disposable Paseo home with a separate loopback-only daemon and relay disabled. The declared locked dependency preparation ran, the installed revision matched, and the plugin reached `running` with only loading/ready log entries. The temporary daemon was stopped and its home moved to Trash; the existing desktop daemon was untouched.
 - A fresh local dependency installation, type checking, and default tests passed: 21 passed, 2 live integration cases skipped as intended. `npm audit` reported zero vulnerabilities on 2026-11-03; this is a point-in-time dependency check.
 - The public screenshot was captured from the current desktop interface with sample data and private workspace navigation hidden. Its public URL returned HTTP 200 with PNG content type.
@@ -43,5 +45,4 @@ The live suite changes a local Paseo daemon by creating and archiving a fixture 
 
 - Compact layouts and alternate themes have not been visually checked.
 - A physical connection from another Wi-Fi network has not been tested.
-- No registry submission or approval has been performed. Registry review is separate from these checks.
 - This is functional verification, not an independent security audit. Network changes can end a tunnel; automatic reconnection is not implemented.

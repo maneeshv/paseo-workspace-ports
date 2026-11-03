@@ -1,5 +1,7 @@
 # Workspace Ports for Paseo
 
+Available in the [Paseo plugin store](https://paseo.sh/plugins/maneeshv/workspace-ports).
+
 See workspace apps, open them in Paseo, and manage local SSH tunnels from a Ports panel. Workspace Ports supports same-Mac browsing and one configured pair of Macs running Paseo Desktop 0.14.x.
 
 ![Workspace Ports panel with sample applications](assets/screenshot.png)
@@ -23,10 +25,10 @@ Plugins are trusted, unsandboxed code. Review [SECURITY.md](SECURITY.md) before 
 Install on the host that owns the development workspace:
 
 ```sh
-paseo plugin add git:maneeshv/paseo-workspace-ports
+paseo plugin add maneeshv/workspace-ports
 ```
 
-This is a direct Git installation. Registry submission and approval are separate; no registry listing is claimed. The repository is intentionally marked `private: true` in `package.json` to prevent accidental npm publication.
+This installs the reviewed version from the Paseo plugin store. The repository is intentionally marked `private: true` in `package.json` to prevent accidental npm publication.
 
 Open **Ports** from the workspace's new-tab menu, choose **Open workspace ports** in Command Center, or use **`/ports`**. A second plugin installation on the viewing Mac is optional; its connected Paseo daemon is required for remote forwarding.
 
