@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+coverage/
+.claude/
+.agents/
+.codex/
+.env
+.env.*
+*.log
+*.tgz
+docs/local/
+design/

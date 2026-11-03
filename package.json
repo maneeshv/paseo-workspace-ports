@@ -1,0 +1,59 @@
+{
+  "name": "paseo-workspace-ports",
+  "private": true,
+  "version": "0.1.0",
+  "files": [
+    "paseo-plugin.json",
+    "OVERVIEW.md",
+    "OVERVIEW.*.md",
+    "index.client.ts",
+    "index.client.tsx",
+    "index.server.ts",
+    "index.server.tsx",
+    "client/",
+    "server/",
+    "shared/",
+    "tsconfig.json",
+    "assets/",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "devDependencies": {
+    "@getpaseo/plugin": "0.14.0",
+    "@tanstack/react-query": "^5.90.11",
+    "@types/react": "~19.2.0",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "typescript": "^5.9.3",
+    "zod": "^4.4.3",
+    "@getpaseo/client": "0.14.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.20.0"
+  },
+  "type": "module",
+  "description": "Workspace apps and local SSH forwarding for Paseo Desktop",
+  "imports": {
+    "#client/*": "./client/*.ts",
+    "#server/*": "./server/*.ts",
+    "#shared/*": "./shared/*.ts",
+    "#client/panel": "./client/panel.tsx",
+    "#client/setup": "./client/setup.tsx",
+    "#client/components": "./client/components.tsx"
+  },
+  "license": "MIT",
+  "author": "Maneesh (maneeshv)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maneeshv/paseo-workspace-ports.git"
+  },
+  "homepage": "https://github.com/maneeshv/paseo-workspace-ports#readme",
+  "bugs": {
+    "url": "https://github.com/maneeshv/paseo-workspace-ports/issues"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

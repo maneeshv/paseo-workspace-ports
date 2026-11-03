@@ -1,0 +1,19 @@
+{
+  "id": "workspace-ports",
+  "name": "Workspace Ports",
+  "description": "Discover workspace apps and open them through a local SSH tunnel.",
+  "requirements": {
+    "paseo": ">=0.14.0 <0.15.0"
+  },
+  "build": [
+    [
+      "npm",
+      "ci",
+      "--ignore-scripts"
+    ]
+  ],
+  "icon": "assets/icon.png",
+  "media": [
+    "assets/screenshot.png"
+  ]
+}

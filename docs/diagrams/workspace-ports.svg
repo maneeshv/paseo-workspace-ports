@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1220" viewBox="0 0 1800 1220">
+<defs>
+ <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#536b85" stroke-width="1.7"/></marker>
+ <marker id="secure" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#087f8c" stroke-width="1.7"/></marker>
+ <symbol id="laptop" viewBox="0 0 64 64"><rect x="10" y="9" width="44" height="34" rx="4"/><path d="M5 51h54l-5 5H10zM25 51h14"/></symbol>
+ <symbol id="file" viewBox="0 0 64 64"><path d="M14 5h25l12 12v42H14zM39 5v14h12M22 30h21M22 39h21M22 48h15"/></symbol>
+ <symbol id="terminal" viewBox="0 0 64 64"><rect x="5" y="9" width="54" height="46" rx="6"/><path d="m16 24 10 8-10 8m18 0h14"/></symbol>
+ <symbol id="browser" viewBox="0 0 64 64"><rect x="5" y="8" width="54" height="48" rx="6"/><path d="M5 21h54M13 15h2m5 0h2m5 0h2m-6 14-9 9 9 9m18-18 9 9-9 9"/></symbol>
+ <symbol id="server" viewBox="0 0 64 64"><rect x="10" y="6" width="44" height="22" rx="4"/><rect x="10" y="36" width="44" height="22" rx="4"/><path d="M18 17h3m6 0h3m-12 30h3m6 0h3m12-32h5m-5 32h5"/></symbol>
+ <symbol id="sliders" viewBox="0 0 64 64"><path d="M8 16h48M8 32h48M8 48h48"/><circle cx="22" cy="16" r="6" fill="#fff"/><circle cx="42" cy="32" r="6" fill="#fff"/><circle cx="28" cy="48" r="6" fill="#fff"/></symbol>
+ <symbol id="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="29" rx="6"/><path d="M21 28V18a11 11 0 0 1 22 0v10m-11 12v7"/></symbol>
+</defs>
+<style>
+ text{font-family:Arial,Helvetica,sans-serif;fill:#1c3048} .title{font-size:43px;font-weight:700}.sub{font-size:23px;fill:#5e7085}.label{font-size:25px;font-weight:700}.body{font-size:22px}.small{font-size:19px;fill:#5e7085}.mono{font-family:monospace;font-size:21px}.cap{font-size:17px;font-weight:700;letter-spacing:1.8px;fill:#536b85}.icon{fill:none;stroke:#355573;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.route{fill:none;stroke:#087f8c;stroke-width:4;marker-end:url(#secure)}.control{fill:none;stroke:#536b85;stroke-width:2.5;stroke-dasharray:8 7;marker-end:url(#arrow)}
+</style>
+<rect width="1800" height="1220" fill="#f8fafc"/>
+<text x="60" y="74" class="title">How Workspace Ports finds your home Mac</text>
+<text x="60" y="115" class="sub">One saved SSH target → native SSH config → your home app over Tailscale</text>
+<rect x="1340" y="39" width="400" height="55" rx="27" fill="#dff3e9"/>
+<text x="1540" y="74" text-anchor="middle" style="font-size:22px;font-weight:700;fill:#21664d">SAVED SETTING · NOT HARDCODED</text>
+
+<text x="60" y="171" class="cap">HOW THE DESTINATION IS CHOSEN</text>
+<rect x="60" y="195" width="500" height="260" rx="22" fill="#edf0fb" stroke="#d3dbed"/>
+<use href="#sliders" x="85" y="219" width="56" height="56" class="icon"/>
+<text x="156" y="244" class="label">1. Paseo Connection settings</text>
+<text x="156" y="273" class="small">Saved for the Home host</text>
+<text x="90" y="320" class="small">SSH target</text>
+<text x="90" y="355" class="mono" style="font-size:26px;font-weight:700">home-dev</text>
+<text x="90" y="402" class="body">Viewer: Laptop · helper workspace selected</text>
+<text x="90" y="431" class="small">The plugin reads the saved sshTarget value.</text>
+
+<path d="M572 325h45" class="control"/>
+<rect x="635" y="195" width="610" height="260" rx="22" fill="#fff" stroke="#cdd8e5"/>
+<use href="#file" x="660" y="219" width="56" height="56" class="icon"/>
+<text x="733" y="244" class="label">2. SSH reads ~/.ssh/config</text>
+<text x="733" y="273" class="small">The file on your viewing Mac</text>
+<text x="665" y="320" class="mono">Host home-dev</text>
+<text x="685" y="354" class="mono">HostName home-mac</text>
+<text x="685" y="388" class="mono">User developer</text>
+<text x="665" y="431" class="small">IdentityFile selects the dedicated SSH key.</text>
+
+<path d="M1257 325h45" class="control"/>
+<rect x="1320" y="195" width="420" height="260" rx="22" fill="#eaf6f5" stroke="#c8e3df"/>
+<use href="#server" x="1345" y="219" width="56" height="56" class="icon"/>
+<text x="1417" y="244" class="label">3. MagicDNS</text>
+<text x="1417" y="273" class="small">Tailscale resolves the name</text>
+<text x="1350" y="320" class="mono" style="font-size:22px">home-mac</text>
+<path d="M1530 337v28" class="control"/>
+<text x="1530" y="407" text-anchor="middle" class="mono" style="font-size:32px;font-weight:700;fill:#087f8c">100.x.y.z</text>
+<text x="1530" y="436" text-anchor="middle" class="small">Example Tailscale address</text>
+
+<text x="60" y="510" class="cap">WHAT HAPPENS WHEN YOU CLICK CONNECT &amp; OPEN</text>
+<rect x="60" y="540" width="710" height="385" rx="26" fill="#edf3fc" stroke="#bed0e8" stroke-width="2"/>
+<use href="#laptop" x="85" y="559" width="64" height="64" class="icon"/>
+<text x="166" y="589" class="label">Viewing Mac · Laptop</text>
+<text x="166" y="618" class="small">Paseo desktop + local daemon</text>
+<rect x="90" y="652" width="255" height="216" rx="18" fill="#fff" stroke="#cdd8e5"/>
+<use href="#browser" x="182" y="674" width="70" height="70" class="icon"/>
+<text x="217" y="779" text-anchor="middle" class="label">Paseo browser</text>
+<text x="217" y="815" text-anchor="middle" class="mono">127.0.0.1:8790</text>
+<text x="217" y="844" text-anchor="middle" class="small">Local end of the tunnel</text>
+<path d="M350 756h112" class="route"/>
+<text x="406" y="733" text-anchor="middle" class="small">HTTP</text>
+<rect x="480" y="652" width="260" height="216" rx="18" fill="#fff" stroke="#cdd8e5"/>
+<use href="#terminal" x="575" y="674" width="70" height="70" class="icon"/>
+<text x="610" y="779" text-anchor="middle" class="label">Native SSH</text>
+<text x="610" y="815" text-anchor="middle" class="body">Helper terminal</text>
+<text x="610" y="844" text-anchor="middle" class="small">Uses your saved alias</text>
+<text x="90" y="900" class="small">The plugin asks the local daemon to launch this terminal.</text>
+
+<use href="#lock" x="856" y="620" width="78" height="78" class="icon" style="stroke:#087f8c"/>
+<text x="895" y="729" text-anchor="middle" class="label" style="fill:#087f8c">Tailscale</text>
+<path d="M746 756h315" class="route"/>
+<path d="M780 766h260" fill="none" stroke="#70b6b8" stroke-width="2"/>
+<text x="911" y="801" text-anchor="middle" class="body">SSH · TCP 22</text>
+<text x="911" y="833" text-anchor="middle" class="small">Encrypted connection</text>
+<text x="911" y="862" text-anchor="middle" class="small">Across different networks</text>
+
+<rect x="1080" y="540" width="660" height="385" rx="26" fill="#edf7f3" stroke="#bddccc" stroke-width="2"/>
+<use href="#laptop" x="1105" y="559" width="64" height="64" class="icon"/>
+<text x="1186" y="589" class="label">Home Mac · Home</text>
+<text x="1186" y="618" class="small">Workspace host · user developer</text>
+<rect x="1110" y="652" width="240" height="216" rx="18" fill="#fff" stroke="#c8ded4"/>
+<use href="#server" x="1195" y="674" width="70" height="70" class="icon"/>
+<text x="1230" y="779" text-anchor="middle" class="label">SSH server</text>
+<text x="1230" y="815" text-anchor="middle" class="body">Verifies the SSH key</text>
+<text x="1230" y="844" text-anchor="middle" class="small">Forwards to loopback</text>
+<path d="M1355 756h85" class="route"/>
+<text x="1398" y="733" text-anchor="middle" class="small">HTTP</text>
+<rect x="1460" y="652" width="250" height="216" rx="18" fill="#fff" stroke="#c8ded4"/>
+<use href="#browser" x="1550" y="674" width="70" height="70" class="icon"/>
+<text x="1585" y="779" text-anchor="middle" class="label">Your app</text>
+<text x="1585" y="815" text-anchor="middle" class="mono">127.0.0.1:8790</text>
+<text x="1585" y="844" text-anchor="middle" class="small">Remote loopback</text>
+<text x="1110" y="900" class="small">8790 is an example; the local port can be changed.</text>
+
+<rect x="60" y="958" width="1680" height="122" rx="20" fill="#fff" stroke="#d6dfe8"/>
+<text x="90" y="991" class="cap">SEPARATE PASEO CONTROL CONNECTION</text>
+<text x="90" y="1038" class="label">Ports panel</text>
+<path d="M290 1028h310" class="control"/>
+<text x="626" y="1036" class="body">List ports · start / stop managed apps · read logs</text>
+<path d="M1170 1028h160" class="control"/>
+<text x="1360" y="1038" class="label">Home plugin backend</text>
+
+<path d="M70 1126h65" class="control"/><text x="155" y="1133" class="small">Settings / control requests</text>
+<path d="M520 1126h65" class="route"/><text x="605" y="1133" class="small">App request path · responses return along the same route</text>
+<text x="60" y="1185" class="body" style="font-weight:700">The plugin chooses the saved SSH target. OpenSSH chooses the matching config entry and key.</text>
+</svg>
