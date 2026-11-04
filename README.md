@@ -14,7 +14,7 @@ See workspace apps, open them in Paseo, manage local SSH tunnels, and share apps
 
 ## Requirements
 
-- macOS and Paseo Desktop/daemons **0.14.x**. Other platforms and Paseo versions are not supported by this release.
+- macOS and Paseo Desktop/daemons **0.14.x or 0.15.x**. Other platforms and Paseo versions are not supported by this release. After updating Paseo, restart the daemon so it matches the app.
 - Node.js **22.13 or newer** and npm available on the installation daemon's command path. Git installation runs the manifest's locked preparation command, `npm ci --ignore-scripts`, so the builder can resolve SDK/type packages. Dependency lifecycle scripts are disabled.
 - For remote apps, both hosts connected in Paseo, a running local daemon on the viewing Mac, and working noninteractive SSH key authentication with an already trusted host key.
 - macOS system tools including OpenSSH, `lsof`, and `/usr/bin/trash`.

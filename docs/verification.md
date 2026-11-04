@@ -55,8 +55,19 @@ Design and evidence: [docs/specs/tailnet-sharing.md](specs/tailnet-sharing.md).
   - The Serve configuration was `{}` before and after.
   - The disposable workspace was archived by the test. The certificate had already been issued during Phase 0, so this run did not exercise the slow first handshake.
 
+## Paseo 0.15 compatibility (Workspace Ports 0.2.0)
+
+The manifest range is `>=0.14.0 <0.16.0`.
+- **0.14.0:** the earlier default and live checks above passed.
+- **0.15.0** (2026-11-04):
+  - Type checking passed against `@getpaseo/plugin` and `@getpaseo/client` 0.15.0.
+  - The default tests passed: 35 passed, 2 live cases skipped.
+  - The plugin, installed from a local directory, reached `running` on a 0.15.0 daemon.
+  - The opt-in live managed-service and tailnet-share test passed against that daemon. The Serve configuration was `{}` before and after.
+- **Version skew:** a 0.14.0 daemon left running after the Paseo app updated to 0.15.0 rejects newly started plugin processes ("invalid message", path `hooks`). Restart the daemon after updating Paseo.
+
 Not yet established for tailnet sharing:
-- The plugin has not been installed or reloaded in Paseo. The panel UI has not been inspected on desktop (wide or compact) or on a phone.
+- The panel UI has not been inspected in a Paseo client on desktop (wide or compact) or on a phone. A bundled web client could not connect to the local daemon directly.
 - No phone on another network (V9), no tailnet with HTTPS certificates disabled (V4), and no App Store Tailscale variant have been checked.
 
 ## Reproduction
