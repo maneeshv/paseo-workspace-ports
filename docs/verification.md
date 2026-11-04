@@ -25,6 +25,40 @@ Workspace Ports is [published in the Paseo plugin store](https://paseo.sh/plugin
 - The public screenshot was captured from the current desktop interface with sample data and private workspace navigation hidden. Its public URL returned HTTP 200 with PNG content type.
 - GitHub Actions runs the locked install, type checking, and default tests on macOS with Node.js 22. See the [CI results](https://github.com/maneeshv/paseo-workspace-ports/actions/workflows/ci.yml) for each commit's status.
 
+## Tailnet sharing (0.2.0, in development)
+
+Design and evidence: [docs/specs/tailnet-sharing.md](specs/tailnet-sharing.md).
+
+- **Tailscale behavior (Phase 0):** measured on 2026-11-04 with Tailscale 1.102.2 (Standalone) on macOS, using a disposable loopback fixture and a client on the same Mac.
+  - A foreground `serve` mapping was removed within 3 s after SIGTERM, SIGHUP, and SIGKILL.
+  - Foreground mappings appear under `Foreground` in `serve status --json`.
+  - A second `serve` on a served port fails without affecting the first.
+  - The backend received `Host: <dnsName>:<port>`, `X-Forwarded-For`, and `Tailscale-User-Login`, and WebSocket upgrades passed through.
+  - The first TLS handshake took about 32 s while the certificate was issued; later handshakes took about 16 ms.
+  - The Serve configuration was empty before and after the checks.
+- **Default tests:** type checking and the default tests passed, 35 passed and 2 live cases skipped. The share tests run the real `execFile` path against a fake Tailscale CLI. They cover:
+  - status and Serve config parsing, including foreground sessions
+  - share-name ownership
+  - wrapper validity and positional arguments
+  - absence of Funnel, `reset`, `--bg`, and `off`
+  - concurrent start deduplication, including per-port serialization across apps
+  - startup before the wrapper prints its start marker
+  - rejection of stopped, non-listening, or IPv6-only apps and of already served ports
+  - failed-start cleanup limited to the share's own terminal
+  - list status derivation
+  - stop limited to owned terminals
+
+- **Live test:** on 2026-11-04 the opt-in managed-service test passed against the local Paseo 0.14.0 daemon and Tailscale 1.102.2, run as `PASEO_PORTS_INTEGRATION=1 PASEO_PORTS_TAILSCALE=1`, selected with `--test-name-pattern="managed app listing"`.
+  - A share terminal created through Paseo reached `running`, and the fixture responded over its tailnet HTTPS link.
+  - Stopping the share removed the Serve mapping, and the fixture app kept responding.
+  - The test reported this with its own diagnostic line.
+  - The Serve configuration was `{}` before and after.
+  - The disposable workspace was archived by the test. The certificate had already been issued during Phase 0, so this run did not exercise the slow first handshake.
+
+Not yet established for tailnet sharing:
+- The plugin has not been installed or reloaded in Paseo. The panel UI has not been inspected on desktop (wide or compact) or on a phone.
+- No phone on another network (V9), no tailnet with HTTPS certificates disabled (V4), and no App Store Tailscale variant have been checked.
+
 ## Reproduction
 
 ```sh

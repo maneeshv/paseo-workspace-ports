@@ -20,6 +20,8 @@ To test live behavior on a trusted development Mac with Paseo running:
 PASEO_PORTS_INTEGRATION=1 npm test
 ```
 
+To include tailnet sharing in the live managed-service test, also set `PASEO_PORTS_TAILSCALE=1`. This briefly adds a tailnet-only foreground Tailscale Serve mapping on the fixture app's port, fetches it over HTTPS, stops the share, and checks that the mapping is gone and the app still responds. It requires Tailscale with HTTPS certificates on the development Mac and changes that Mac's Serve configuration for the duration of the test.
+
 These tests create and archive a disposable local Paseo workspace, start and stop a fixture service, and run a temporary loopback SSH server with fixture keys. They require the Paseo CLI, macOS SSH tools, and `trash`. Only run them against a daemon you are authorized to change. They do not test a real remote Mac or desktop interaction.
 
 For manual testing, install this checkout on your development host using the setup in [README.md](README.md). Reload only your development installation after changes. Do not restart a daemon as a substitute for reloading the plugin.

@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1230" viewBox="0 0 1800 1230">
+<defs>
+ <marker id="m-teal" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#087f8c" stroke-width="1.7"/></marker>
+ <marker id="m-grey" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#8a99aa" stroke-width="1.7"/></marker>
+ <marker id="m-ctrl" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#6a5bd6" stroke-width="1.7"/></marker>
+ <marker id="m-red" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#c2413b" stroke-width="1.7"/></marker>
+ <symbol id="phone" viewBox="0 0 64 64"><rect x="18" y="4" width="28" height="56" rx="6"/><path d="M28 52h8M27 10h10"/></symbol>
+ <symbol id="laptop" viewBox="0 0 64 64"><rect x="10" y="9" width="44" height="34" rx="4"/><path d="M5 51h54l-5 5H10zM25 51h14"/></symbol>
+ <symbol id="terminal" viewBox="0 0 64 64"><rect x="5" y="9" width="54" height="46" rx="6"/><path d="m16 24 10 8-10 8m18 0h14"/></symbol>
+ <symbol id="browser" viewBox="0 0 64 64"><rect x="5" y="8" width="54" height="48" rx="6"/><path d="M5 21h54M13 15h2m5 0h2m5 0h2m-6 14-9 9 9 9m18-18 9 9-9 9"/></symbol>
+ <symbol id="server" viewBox="0 0 64 64"><rect x="10" y="6" width="44" height="22" rx="4"/><rect x="10" y="36" width="44" height="22" rx="4"/><path d="M18 17h3m6 0h3m-12 30h3m6 0h3m12-32h5m-5 32h5"/></symbol>
+ <symbol id="panel" viewBox="0 0 64 64"><rect x="6" y="8" width="52" height="48" rx="6"/><path d="M6 22h52M16 33h20M16 44h14M44 33h4M44 44h4"/></symbol>
+ <symbol id="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="29" rx="6"/><path d="M21 28V18a11 11 0 0 1 22 0v10m-11 12v7"/></symbol>
+ <symbol id="shield" viewBox="0 0 64 64"><path d="M32 5 54 13v17c0 14-9 24-22 29C19 54 10 44 10 30V13z"/><path d="m22 31 7 7 13-14"/></symbol>
+ <symbol id="globe" viewBox="0 0 64 64"><circle cx="32" cy="32" r="25"/><ellipse cx="32" cy="32" rx="11" ry="25"/><path d="M7 32h50M11 19h42M11 45h42"/></symbol>
+</defs>
+<style>
+ text{font-family:Arial,Helvetica,sans-serif;fill:#1c3048}
+ .title{font-size:42px;font-weight:700}.sub{font-size:22px;fill:#5e7085}
+ .label{font-size:24px;font-weight:700}.label2{font-size:21px;font-weight:700}
+ .body{font-size:20px}.small{font-size:17px;fill:#5e7085}.tiny{font-size:15px;fill:#5e7085}
+ .mono{font-family:Menlo,Consolas,monospace;font-size:16px;fill:#1c3048}
+ .cap{font-size:16px;font-weight:700;letter-spacing:1.6px;fill:#536b85}
+ .icon{fill:none;stroke:#355573;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+ .icon-teal{fill:none;stroke:#087f8c;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+ .icon-muted{fill:none;stroke:#8a99aa;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+ .route{fill:none;stroke:#087f8c;stroke-width:5;marker-end:url(#m-teal)}
+ .legacy{fill:none;stroke:#8a99aa;stroke-width:3.5;marker-end:url(#m-grey)}
+ .ctrl{fill:none;stroke:#6a5bd6;stroke-width:2.5;stroke-dasharray:8 6;marker-end:url(#m-ctrl)}
+ .blocked{fill:none;stroke:#c2413b;stroke-width:2.5;stroke-dasharray:7 6;marker-end:url(#m-red)}
+ .new rect{fill:#087f8c}.new text{font-size:13px;font-weight:700;letter-spacing:1px;fill:#fff}
+ .same rect{fill:#e3e8ee}.same text{font-size:13px;font-weight:700;letter-spacing:1px;fill:#5e7085}
+</style>
+
+<rect width="1800" height="1230" fill="#f8fafc"/>
+
+<!-- Header -->
+<text x="60" y="72" class="title">Share to tailnet: open workspace apps from your phone</text>
+<text x="60" y="110" class="sub">Proposed for Workspace Ports 0.2.0 · Tailscale Serve on the workspace Mac · no SSH keys on the phone</text>
+<rect x="1400" y="40" width="340" height="50" rx="25" fill="#dff3e9"/>
+<text x="1570" y="73" text-anchor="middle" style="font-size:20px;font-weight:700;fill:#21664d">TAILNET ONLY · NOT PUBLIC</text>
+
+<!-- Column captions -->
+<text x="60" y="172" class="cap">CLIENT DEVICES</text>
+<text x="520" y="172" class="cap">NETWORK PATHS</text>
+
+<!-- ============ Phone (new) ============ -->
+<rect x="60" y="190" width="420" height="450" rx="22" fill="#edf3fc" stroke="#bed0e8"/>
+<g class="new"><rect x="396" y="178" width="66" height="26" rx="13"/><text x="429" y="196" text-anchor="middle">NEW</text></g>
+<use href="#phone" x="78" y="206" width="58" height="58" class="icon"/>
+<text x="146" y="236" class="label">Phone</text>
+<text x="146" y="262" class="small">Paseo app + Tailscale app · tailnet member</text>
+
+<rect x="85" y="292" width="370" height="140" rx="16" fill="#fff" stroke="#cdd8e5"/>
+<use href="#browser" x="103" y="310" width="50" height="50" class="icon"/>
+<text x="166" y="333" class="label2">System browser</text>
+<text x="166" y="358" class="small">Safari or default browser</text>
+<text x="105" y="410" class="mono">https://work.example.ts.net:56230</text>
+
+<rect x="85" y="475" width="370" height="145" rx="16" fill="#fff" stroke="#cdd8e5"/>
+<use href="#panel" x="103" y="492" width="50" height="50" class="icon"/>
+<text x="166" y="515" class="label2">Paseo app · Ports panel</text>
+<text x="166" y="540" class="small">Drives agents remotely</text>
+<rect x="105" y="562" width="150" height="40" rx="8" fill="#2f7a52"/>
+<text x="180" y="588" text-anchor="middle" style="font-size:17px;font-weight:700;fill:#fff">Share &amp; Open</text>
+<text x="270" y="580" class="tiny">Copy link</text>
+<text x="270" y="600" class="tiny">Stop sharing</text>
+<!-- openExternalUrl hop -->
+<path d="M300 475 V440" class="ctrl"/>
+<text x="312" y="462" class="mono" style="font-size:14px;fill:#6a5bd6">openExternalUrl</text>
+
+<!-- ============ Viewing Mac (existing) ============ -->
+<rect x="60" y="690" width="420" height="190" rx="22" fill="#f1f4f7" stroke="#d6dfe8"/>
+<g class="same"><rect x="352" y="678" width="110" height="26" rx="13"/><text x="407" y="696" text-anchor="middle">UNCHANGED</text></g>
+<use href="#laptop" x="78" y="706" width="58" height="58" class="icon-muted"/>
+<text x="146" y="736" class="label" style="fill:#5e7085">Viewing Mac</text>
+<text x="146" y="762" class="small">Paseo desktop</text>
+<text x="85" y="812" class="small">Paseo browser → 127.0.0.1:&lt;local port&gt;</text>
+<text x="85" y="842" class="small">SSH tunnel terminal in tunnel workspace</text>
+
+<!-- ============ Network bands ============ -->
+<rect x="520" y="250" width="340" height="180" rx="18" fill="#eaf6f5" stroke="#70b6b8" stroke-dasharray="6 5"/>
+<text x="540" y="278" class="cap" style="fill:#087f8c">YOUR TAILNET</text>
+<use href="#lock" x="670" y="282" width="40" height="40" class="icon-teal"/>
+<text x="690" y="348" text-anchor="middle" class="label2" style="fill:#087f8c">HTTPS · TCP 56230</text>
+<text x="690" y="400" text-anchor="middle" class="small">WireGuard · devices your ACLs allow</text>
+
+<rect x="520" y="470" width="340" height="160" rx="18" fill="#f1effb" stroke="#c9c2ef" stroke-dasharray="6 5"/>
+<text x="540" y="498" class="cap" style="fill:#6a5bd6">PASEO CONNECTION</text>
+<text x="690" y="535" text-anchor="middle" class="mono" style="font-size:17px;fill:#6a5bd6">share.start · list · stop</text>
+<text x="690" y="590" text-anchor="middle" class="small">existing link · relay or direct</text>
+<text x="690" y="612" text-anchor="middle" class="tiny">3 new RPCs</text>
+
+<rect x="520" y="700" width="340" height="170" rx="18" fill="#f4f6f8" stroke="#d6dfe8" stroke-dasharray="6 5"/>
+<text x="540" y="728" class="cap">SSH NETWORK</text>
+<text x="690" y="768" text-anchor="middle" class="label2" style="fill:#5e7085">SSH · TCP 22</text>
+<text x="690" y="822" text-anchor="middle" class="small">-L forward to loopback</text>
+<text x="690" y="846" text-anchor="middle" class="tiny">existing path, unchanged</text>
+
+<!-- ============ Workspace Mac boundary ============ -->
+<rect x="890" y="190" width="860" height="690" rx="26" fill="#edf7f3" stroke="#bddccc"/>
+<use href="#laptop" x="906" y="198" width="36" height="36" class="icon"/>
+<text x="950" y="224" class="label2">Workspace Mac · Work</text>
+<text x="1196" y="224" class="small">tailnet member</text>
+
+<!-- Cross-boundary routes drawn above the boundary -->
+<path d="M455 362 H916" class="route"/>
+<path d="M455 552 H916" class="ctrl"/>
+<path d="M480 785 H916" class="legacy"/>
+
+<!-- ============ Public internet (blocked) ============ -->
+<rect x="1505" y="128" width="230" height="46" rx="23" fill="#fff" stroke="#e7b9b6"/>
+<use href="#globe" x="1520" y="134" width="34" height="34" style="fill:none;stroke:#c2413b;stroke-width:3"/>
+<text x="1562" y="158" class="body" style="fill:#c2413b;font-weight:700">Public internet</text>
+<path d="M1620 176 V250" class="blocked"/>
+<circle cx="1620" cy="212" r="13" fill="#fff" stroke="#c2413b" stroke-width="2.5"/>
+<path d="M1613 205 l14 14 m0 -14 l-14 14" stroke="#c2413b" stroke-width="2.5"/>
+<text x="1642" y="218" class="tiny" style="fill:#c2413b;font-weight:700">No Funnel</text>
+
+
+<!-- tailscaled -->
+<rect x="920" y="255" width="270" height="160" rx="16" fill="#fff" stroke="#70b6b8" stroke-width="2"/>
+<g class="new"><rect x="1108" y="243" width="66" height="26" rx="13"/><text x="1141" y="261" text-anchor="middle">NEW</text></g>
+<use href="#shield" x="936" y="272" width="50" height="50" class="icon-teal"/>
+<text x="998" y="300" class="label2">tailscaled</text>
+<text x="998" y="324" class="small">Serve · Tailscale app</text>
+<text x="938" y="360" class="mono" style="font-size:15px">HTTPS :56230</text>
+<text x="938" y="384" class="tiny">TLS terminates here</text>
+
+<!-- Paseo daemon + plugin -->
+<rect x="920" y="470" width="270" height="165" rx="16" fill="#fff" stroke="#c9c2ef" stroke-width="2"/>
+<g class="new"><rect x="1108" y="458" width="66" height="26" rx="13"/><text x="1141" y="476" text-anchor="middle">NEW</text></g>
+<use href="#server" x="936" y="488" width="50" height="50" class="icon"/>
+<text x="998" y="512" class="label2">Paseo daemon</text>
+<text x="998" y="536" class="small">Workspace Ports plugin</text>
+<text x="938" y="578" class="mono" style="font-size:15px">share.* handlers</text>
+<text x="938" y="602" class="tiny">app must be in this</text>
+<text x="938" y="621" class="tiny">workspace's app list</text>
+
+<!-- sshd (existing) -->
+<rect x="920" y="705" width="270" height="150" rx="16" fill="#f7f9fa" stroke="#d6dfe8"/>
+<g class="same"><rect x="1062" y="693" width="110" height="26" rx="13"/><text x="1117" y="711" text-anchor="middle">UNCHANGED</text></g>
+<use href="#server" x="936" y="722" width="50" height="50" class="icon-muted"/>
+<text x="998" y="748" class="label2" style="fill:#5e7085">sshd</text>
+<text x="998" y="772" class="small">macOS Remote Login</text>
+<text x="938" y="822" class="tiny">key auth · known host</text>
+
+<!-- Paseo terminal (owned share) -->
+<rect x="1250" y="470" width="255" height="180" rx="16" fill="#fff" stroke="#c9c2ef" stroke-width="2"/>
+<g class="new"><rect x="1424" y="458" width="66" height="26" rx="13"/><text x="1457" y="476" text-anchor="middle">NEW</text></g>
+<use href="#terminal" x="1264" y="488" width="44" height="44" class="icon"/>
+<text x="1316" y="512" class="label2">Paseo terminal</text>
+<text x="1316" y="534" class="tiny">owned share · foreground</text>
+<text x="1266" y="572" class="mono" style="font-size:14.5px">tailscale serve</text>
+<text x="1266" y="594" class="mono" style="font-size:14.5px">  --https=56230</text>
+<text x="1266" y="616" class="mono" style="font-size:14.5px">  http://127.0.0.1:56230</text>
+<text x="1266" y="640" class="tiny">share ends with terminal*</text>
+
+<!-- App -->
+<rect x="1545" y="255" width="180" height="600" rx="16" fill="#fff" stroke="#bddccc" stroke-width="2"/>
+<use href="#browser" x="1603" y="470" width="64" height="64" class="icon"/>
+<text x="1635" y="572" text-anchor="middle" class="label">Your app</text>
+<text x="1635" y="604" text-anchor="middle" class="mono">127.0.0.1</text>
+<text x="1635" y="626" text-anchor="middle" class="mono">:56230</text>
+<text x="1635" y="662" text-anchor="middle" class="tiny">loopback only</text>
+<text x="1635" y="682" text-anchor="middle" class="tiny">app unchanged</text>
+
+<!-- Internal routes -->
+<path d="M1190 330 H1541" class="route"/>
+<text x="1365" y="316" text-anchor="middle" class="small" style="fill:#087f8c;font-weight:700">HTTP → 127.0.0.1:56230</text>
+<path d="M1190 785 H1541" class="legacy"/>
+<text x="1365" y="771" text-anchor="middle" class="small">HTTP → 127.0.0.1:56230</text>
+
+<!-- Control inside workspace Mac -->
+<path d="M1190 552 H1246" class="ctrl"/>
+<text x="1218" y="538" text-anchor="middle" class="tiny" style="fill:#6a5bd6">creates</text>
+<path d="M1378 470 V388 H1194" class="ctrl"/>
+<text x="1290" y="380" text-anchor="middle" class="tiny" style="fill:#6a5bd6">registers mapping</text>
+<path d="M1000 470 V419" class="ctrl"/>
+<text x="1010" y="448" class="mono" style="font-size:13.5px;fill:#6a5bd6">status --json</text>
+
+<!-- ============ Legend ============ -->
+<rect x="60" y="915" width="660" height="280" rx="18" fill="#fff" stroke="#cdd8e5"/>
+<text x="85" y="950" class="cap">LEGEND</text>
+<path d="M85 985 H165" class="route"/><text x="185" y="991" class="body">App traffic over tailnet (new)</text>
+<path d="M85 1027 H165" class="legacy"/><text x="185" y="1033" class="body">App traffic over SSH tunnel (unchanged)</text>
+<path d="M85 1069 H165" class="ctrl"/><text x="185" y="1075" class="body">Control: Paseo RPC and local commands</text>
+<path d="M85 1111 H165" class="blocked"/>
+<circle cx="125" cy="1111" r="10" fill="#fff" stroke="#c2413b" stroke-width="2"/><path d="M120 1106 l10 10 m0 -10 l-10 10" stroke="#c2413b" stroke-width="2"/>
+<text x="185" y="1117" class="body">Not allowed: public route</text>
+<g class="new"><rect x="85" y="1145" width="66" height="26" rx="13"/><text x="118" y="1163" text-anchor="middle">NEW</text></g>
+<text x="162" y="1164" class="body">Added by this change</text>
+<g class="same"><rect x="400" y="1145" width="110" height="26" rx="13"/><text x="455" y="1163" text-anchor="middle">UNCHANGED</text></g>
+<text x="522" y="1164" class="body">Existing</text>
+
+<!-- ============ Lifecycle ============ -->
+<rect x="750" y="915" width="990" height="280" rx="18" fill="#fff" stroke="#cdd8e5"/>
+<text x="775" y="950" class="cap">SHARE LIFECYCLE · ONE OWNED PASEO TERMINAL PER SHARE</text>
+
+<rect x="775" y="972" width="270" height="48" rx="12" fill="#eaf6f5" stroke="#70b6b8"/>
+<text x="910" y="1003" text-anchor="middle" class="body">① Share &amp; Open</text>
+<path d="M1050 996 H1090" class="ctrl"/>
+<rect x="1095" y="972" width="270" height="48" rx="12" fill="#eaf6f5" stroke="#70b6b8"/>
+<text x="1230" y="1003" text-anchor="middle" class="body">② Terminal created</text>
+<path d="M1370 996 H1410" class="ctrl"/>
+<rect x="1415" y="972" width="300" height="48" rx="12" fill="#eaf6f5" stroke="#70b6b8"/>
+<text x="1565" y="1003" text-anchor="middle" class="body">③ Serve running · link opens</text>
+
+<rect x="775" y="1036" width="270" height="48" rx="12" fill="#f4f6f8" stroke="#d6dfe8"/>
+<text x="910" y="1067" text-anchor="middle" class="body">④ Stop sharing</text>
+<path d="M1050 1060 H1090" class="ctrl"/>
+<rect x="1095" y="1036" width="270" height="48" rx="12" fill="#f4f6f8" stroke="#d6dfe8"/>
+<text x="1230" y="1067" text-anchor="middle" class="body">⑤ Terminal killed</text>
+<path d="M1370 1060 H1410" class="ctrl"/>
+<rect x="1415" y="1036" width="300" height="48" rx="12" fill="#f4f6f8" stroke="#d6dfe8"/>
+<text x="1565" y="1067" text-anchor="middle" class="body">⑥ Mapping removed*</text>
+
+<text x="775" y="1118" class="small">Stopping a share never stops the app. Stopping the app never removes the share.</text>
+<text x="775" y="1146" class="small">Ownership = exact terminal name in the workspace. Never serve reset, --bg, or Funnel.</text>
+<text x="775" y="1174" class="small" style="fill:#a5641a">* Removal on process exit is unverified: Phase 0 check V1 in docs/specs/tailnet-sharing.md.</text>
+</svg>

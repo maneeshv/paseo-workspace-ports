@@ -1,7 +1,7 @@
 {
   "name": "paseo-workspace-ports",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "files": [
     "paseo-plugin.json",
     "OVERVIEW.md",
@@ -41,7 +41,8 @@
     "#shared/*": "./shared/*.ts",
     "#client/panel": "./client/panel.tsx",
     "#client/setup": "./client/setup.tsx",
-    "#client/components": "./client/components.tsx"
+    "#client/components": "./client/components.tsx",
+    "#client/share": "./client/share.tsx"
   },
   "license": "MIT",
   "author": "Maneesh (maneeshv)",

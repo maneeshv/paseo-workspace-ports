@@ -1,5 +1,5 @@
 import type { PluginTheme } from '@getpaseo/plugin';
-import { Icon } from '@getpaseo/plugin/client/ui';
+import { Icon, TextInput } from '@getpaseo/plugin/client/ui';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
@@ -65,4 +65,26 @@ export function KV({ theme, label, value, children }: {
 
 export function ErrorNote({ theme, text }: { theme: PluginTheme; text: string }) {
   return <Text selectable style={{ color: theme.colors.statusDanger, fontSize: 13 }}>{text}</Text>;
+}
+
+export function PortInput({ theme, value, onChange, disabled }: {
+  theme: PluginTheme;
+  value: string;
+  onChange: (next: string) => void;
+  disabled: boolean;
+}) {
+  return (
+    <TextInput
+      value={value}
+      onChangeText={onChange}
+      editable={!disabled}
+      keyboardType="number-pad"
+      autoCorrect={false}
+      style={{
+        borderWidth: 1, borderColor: theme.colors.border, borderRadius: 6, minWidth: 90,
+        paddingHorizontal: 10, paddingVertical: 6, fontSize: 13, textAlign: 'right',
+        color: theme.colors.foreground, backgroundColor: theme.colors.surface2,
+      }}
+    />
+  );
 }

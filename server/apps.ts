@@ -8,7 +8,7 @@ import type { App } from "#shared/contracts";
 import { discoverWorkspaceListeners, type Listener } from "#server/discovery";
 
 const execute = promisify(execFile);
-const identifier = z.string().min(1).max(512).refine((value) => !/[\x00-\x1f\x7f]/.test(value), "Invalid identifier");
+export const identifier = z.string().min(1).max(512).refine((value) => !/[\x00-\x1f\x7f]/.test(value), "Invalid identifier");
 const scriptSchema = z.object({
   scriptName: identifier,
   type: z.enum(["script", "service"]),
@@ -39,16 +39,20 @@ export function scriptArguments(workspaceId: string, action: "ls" | "start" | "s
   return args;
 }
 
+/** First executable named `name` on PATH, else the first executable fallback. */
+export function findExecutable(name: string, fallbacks: string[], environment: NodeJS.ProcessEnv): string | null {
+  const candidates = [...(environment.PATH ?? "").split(delimiter).filter(Boolean).map((directory) => join(directory, name)), ...fallbacks];
+  return candidates.find((candidate) => {
+    try { accessSync(candidate, constants.X_OK); return true; } catch { return false; }
+  }) ?? null;
+}
+
 export function scriptProcess(environment: NodeJS.ProcessEnv = process.env): { command: string; env: NodeJS.ProcessEnv } {
   const env = { ...environment };
   delete env.PASEO_HOST;
   if (env.PASEO_CLI) return { command: env.PASEO_CLI, env };
-  const candidates = (env.PATH ?? "").split(delimiter).filter(Boolean).map((directory) => join(directory, "paseo"));
-  if (process.platform === "darwin") candidates.push("/Applications/Paseo.app/Contents/Resources/bin/paseo");
-  const command = candidates.find((candidate) => {
-    try { accessSync(candidate, constants.X_OK); return true; } catch { return false; }
-  }) ?? "paseo";
-  return { command, env };
+  const bundled = process.platform === "darwin" ? ["/Applications/Paseo.app/Contents/Resources/bin/paseo"] : [];
+  return { command: findExecutable("paseo", bundled, env) ?? "paseo", env };
 }
 
 async function runScript(workspaceId: string, action: "ls" | "start" | "stop", name?: string): Promise<string> {
@@ -65,7 +69,7 @@ async function runScript(workspaceId: string, action: "ls" | "start" | "stop", n
   }
 }
 
-async function workspaceDirectory(paseo: PaseoApi, workspaceId: string): Promise<string> {
+export async function workspaceDirectory(paseo: PaseoApi, workspaceId: string): Promise<string> {
   identifier.parse(workspaceId);
   const workspace = await paseo.workspaces.ref(workspaceId).refresh();
   if (!workspace) throw new Error("Workspace no longer exists.");
