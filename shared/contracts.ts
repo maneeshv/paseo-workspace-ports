@@ -20,6 +20,29 @@ export const controlAppRpc = defineRpc({ name: 'apps.control',
   output: z.object({ ok: z.literal(true) }) });
 export const appLogsRpc = defineRpc({ name: 'apps.logs',
   input: workspace.extend({ scriptName: z.string().min(1).max(256) }), output: z.object({ text: z.string() }) });
+const AnyPortSchema = z.number().int().min(1).max(65535);
+export const ShareSchema = z.object({
+  terminalId: z.string(), appId: z.string(), appPort: AnyPortSchema, httpsPort: AnyPortSchema,
+  url: z.string(), status: z.enum(['running', 'starting', 'failed']), detail: z.string().optional(),
+});
+export type Share = z.infer<typeof ShareSchema>;
+export const ShareAvailabilitySchema = z.discriminatedUnion('ok', [
+  z.object({ ok: z.literal(true), dnsName: z.string() }),
+  z.object({
+    ok: z.literal(false),
+    reason: z.enum(['not-installed', 'not-running', 'logged-out', 'https-disabled', 'unknown']),
+    message: z.string(),
+  }),
+]);
+export type ShareAvailability = z.infer<typeof ShareAvailabilitySchema>;
+export const ServeMappingSchema = z.object({ httpsPort: AnyPortSchema, target: z.string() });
+export type ServeMapping = z.infer<typeof ServeMappingSchema>;
+export const listSharesRpc = defineRpc({ name: 'share.list', input: workspace,
+  output: z.object({ availability: ShareAvailabilitySchema, shares: z.array(ShareSchema), foreign: z.array(ServeMappingSchema) }) });
+export const startShareRpc = defineRpc({ name: 'share.start',
+  input: workspace.extend({ appId: z.string().min(1).max(512), httpsPort: AnyPortSchema }), output: z.object({ share: ShareSchema }) });
+export const stopShareRpc = defineRpc({ name: 'share.stop',
+  input: workspace.extend({ terminalId: z.string().min(1).max(512) }), output: z.object({ ok: z.literal(true) }) });
 export const pairing = defineSettings({ id: 'pairing', scope: 'host', version: 1,
   schema: z.object({
     viewerHostId: z.string().default(''),

@@ -11,6 +11,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { createPaseoApi } from "@getpaseo/client";
 import { createHostClient } from "@getpaseo/client/node";
 import { appLogs, controlApp, listApps } from "#server/apps";
+import { listShares, startShare, stopShare } from "#server/share";
 import { TUNNEL_SCRIPT } from "#client/tunnels";
 
 const execute = promisify(execFile);
@@ -18,8 +19,8 @@ const execute = promisify(execFile);
 // Explicit opt-in: this test creates and archives its own workspace on the local daemon.
 test("managed app listing, start, HTTP, logs, and stop against local Paseo", {
   skip: process.env.PASEO_PORTS_INTEGRATION !== "1",
-  timeout: 90_000,
-}, async () => {
+  timeout: process.env.PASEO_PORTS_TAILSCALE === "1" ? 240_000 : 90_000,
+}, async (t) => {
   const home = process.env.PASEO_HOME || join(homedir(), ".paseo");
   const cli = process.env.PASEO_CLI || "paseo";
   const run = async (args: string[]) => JSON.parse((await execute(cli, [...args, "--home", home, "--json"], { timeout: 30_000 })).stdout);
@@ -65,6 +66,28 @@ test("managed app listing, start, HTTP, logs, and stop against local Paseo", {
     assert.equal(listing.apps.filter(({ source }) => source === "detected").length, 0, "Managed listener should not duplicate as detected");
     assert.match(await appLogs(api, workspaceId, "web"), /workspace-ports-integration-ready/);
     const port = listing.apps.find(({ id }) => id === "managed:web")!.port!;
+    if (process.env.PASEO_PORTS_TAILSCALE === "1") {
+      // Opt-in: briefly changes this Mac's Tailscale Serve config (tailnet-only foreground share on the app's port).
+      const share = await startShare(api, workspaceId, "managed:web", port);
+      try {
+        assert.equal(share.status, "running");
+        // The first TLS handshake can take tens of seconds while Tailscale issues the certificate.
+        const response = await fetch(share.url); // Bounded by the test timeout.
+        assert.equal(await response.text(), "workspace-ports-integration-ok");
+        assert.equal((await listShares(api, workspaceId)).shares.find(({ terminalId }) => terminalId === share.terminalId)?.status, "running");
+      } finally {
+        await stopShare(api, workspaceId, share.terminalId);
+      }
+      let removed = false;
+      for (let attempt = 0; attempt < 40 && !removed; attempt++) {
+        await delay(250);
+        const after = await listShares(api, workspaceId);
+        removed = after.shares.length === 0 && !after.foreign.some(({ httpsPort }) => httpsPort === port);
+      }
+      assert.equal(removed, true, "Stopping the share terminal should remove its Serve mapping");
+      assert.equal(await (await fetch(`http://127.0.0.1:${port}`)).text(), "workspace-ports-integration-ok", "Stopping a share must not stop the app");
+      t.diagnostic(`tailnet share on :${port} was running, served HTTPS, and its mapping was removed on stop`);
+    }
     await controlApp(api, workspaceId, "web", "stop");
     assert.equal((await listApps(api, workspaceId)).apps.find(({ id }) => id === "managed:web")?.status, "stopped");
     await assert.rejects(fetch(`http://127.0.0.1:${port}`), "Stopping the service should release its listener");

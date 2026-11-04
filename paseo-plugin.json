@@ -1,9 +1,9 @@
 {
   "id": "workspace-ports",
   "name": "Workspace Ports",
-  "description": "Discover workspace apps and open them through a local SSH tunnel.",
+  "description": "Discover workspace apps and open them through a local SSH tunnel or a tailnet-only link.",
   "requirements": {
-    "paseo": ">=0.14.0 <0.15.0"
+    "paseo": ">=0.14.0 <0.16.0"
   },
   "build": [
     [

@@ -1,13 +1,16 @@
 import type { PluginTheme } from '@getpaseo/plugin';
-import { getPaseoClient, useHosts, useRpc, useSettings, type PluginWorkspacePanelProps } from '@getpaseo/plugin/client';
-import { copyText, Icon, Modal, ScrollView, TextInput, useToast } from '@getpaseo/plugin/client/ui';
+import { getPaseoClient, openExternalUrl, useHosts, useRpc, useSettings, type PluginWorkspacePanelProps } from '@getpaseo/plugin/client';
+import { copyText, Icon, Modal, ScrollView, useToast } from '@getpaseo/plugin/client/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Text, View } from 'react-native';
-import { appLogsRpc, controlAppRpc, listAppsRpc, pairing, type App } from '#shared/contracts';
+import {
+  appLogsRpc, controlAppRpc, listAppsRpc, listSharesRpc, pairing, startShareRpc, stopShareRpc, type App, type Share,
+} from '#shared/contracts';
 import { disconnectTunnel, listTunnels, openTunnel, type TunnelRequest, type TunnelState } from '#client/tunnels';
 import { SetupModal } from '#client/setup';
-import { appUrl, Btn, ErrorNote, errText, KV, StatusDot } from '#client/components';
+import { appUrl, Btn, ErrorNote, errText, KV, PortInput, StatusDot } from '#client/components';
+import { ActiveSharesCard, ShareDialog, shareable, shareCell } from '#client/share';
 
 type TunnelRecord = { request: TunnelRequest; state: TunnelState };
 
@@ -16,7 +19,8 @@ type Dialog =
   | { kind: 'connect'; app: App; remotePort: number }
   | { kind: 'logs'; app: App }
   | { kind: 'details'; app: App }
-  | { kind: 'stop'; app: App };
+  | { kind: 'stop'; app: App }
+  | { kind: 'share'; app: App };
 
 export function PortsPanel({ theme, host, layout, navigation, workspaceId }: PluginWorkspacePanelProps) {
   const toast = useToast();
@@ -25,6 +29,9 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
   const listApps = useRpc(listAppsRpc);
   const controlApp = useRpc(controlAppRpc);
   const fetchLogs = useRpc(appLogsRpc);
+  const listShares = useRpc(listSharesRpc);
+  const startShare = useRpc(startShareRpc);
+  const stopShare = useRpc(stopShareRpc);
   const settings = useSettings(pairing);
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
@@ -55,6 +62,25 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
   const tunnels: TunnelRecord[] = tunnelMode ? (tunnelsQuery.data ?? []) : [];
   const tunnelByApp = new Map<string, TunnelRecord>();
   for (const record of tunnels) if (!tunnelByApp.has(record.request.appId)) tunnelByApp.set(record.request.appId, record);
+
+  const sharesQuery = useQuery({
+    queryKey: ['paseo-ports', 'shares', host.id, workspaceId],
+    queryFn: () => listShares({ workspaceId }),
+    refetchInterval: 5000,
+    retry: false,
+  });
+  const availability = sharesQuery.data?.availability;
+  const shareReady = availability?.ok === true;
+  const shares = sharesQuery.data?.shares ?? [];
+  const showShares = shareReady || shares.length > 0;
+  // A share belongs to the row only while it targets the app's current port; prefer a live one over stale ones.
+  const statusRank = { running: 0, starting: 1, failed: 2 } as const;
+  const appShare = (app: App): Share | undefined => shares
+    .filter((share) => share.appId === app.id && share.appPort === app.port)
+    .sort((a, b) => statusRank[a.status] - statusRank[b.status])[0];
+  const appPorts = new Set(apps.map(({ port }) => port));
+  const foreign = (sharesQuery.data?.foreign ?? []).filter(({ target }) =>
+    appPorts.has(Number(/^http:\/\/127\.0\.0\.1:(\d+)$/.exec(target)?.[1])));
 
   // A recovered tunnel only belongs to the row when it still targets the app's current port and the saved alias.
   const matchesApp = (record: TunnelRecord, app: App) =>
@@ -146,6 +172,30 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
     void queryClient.invalidateQueries({ queryKey: ['paseo-ports'] }).catch(() => undefined);
   }
 
+  function openUrl(url: string) {
+    if (openBrowser) { openBrowser({ url, workspaceId, serverId: host.id }); return; }
+    void openExternalUrl(url).catch((error) => toast.error(`Could not open the link: ${errText(error)}`));
+  }
+
+  async function shareApp(app: App, httpsPort: number, open: boolean) {
+    const { share } = await startShare({ workspaceId, appId: app.id, httpsPort });
+    await queryClient.invalidateQueries({ queryKey: ['paseo-ports', 'shares'] });
+    if (open) openUrl(share.url);
+  }
+
+  function stopSharing(share: Share) {
+    run(`unshare:${share.terminalId}`, async () => {
+      await stopShare({ workspaceId, terminalId: share.terminalId });
+      await queryClient.invalidateQueries({ queryKey: ['paseo-ports', 'shares'] });
+    });
+  }
+
+  function copyLink(url: string) {
+    void copyText(url)
+      .then(() => toast.show('Link copied', { variant: 'success' }))
+      .catch(() => toast.error('Could not copy. Select the link in Active shares instead.'));
+  }
+
   function appStatus(app: App): { text: string; color: string } {
     if (app.status === 'running') return { text: 'Running', color: theme.colors.statusSuccess };
     if (app.status === 'stopped') return { text: 'Stopped', color: theme.colors.foregroundMuted };
@@ -171,6 +221,17 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
         <Btn theme={theme} kind="primary" label={openBrowser && configured ? 'Start & Open' : 'Start'}
           busy={busyKey === `start:${app.id}`} onPress={() => startAndOpen(app)} />
       );
+    }
+    const share = appShare(app);
+    if (!openBrowser && app.status === 'running') {
+      // Phones have no in-app browser; the tailnet link is the way to open an app here.
+      if (share?.status === 'running') {
+        return <Btn theme={theme} kind="primary" label="Open shared link" onPress={() => openUrl(share.url)} />;
+      }
+      if (share?.status === 'starting') return <Btn theme={theme} label="Sharing…" disabled onPress={() => undefined} />;
+      if (!share && shareReady && shareable(app)) {
+        return <Btn theme={theme} kind="primary" label="Share & Open" onPress={() => setDialog({ kind: 'share', app })} />;
+      }
     }
     if (record && app.status === 'running' && !matchesApp(record, app)) {
       return (
@@ -207,17 +268,40 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
     return null;
   }
 
+  function shareActions(app: App): ReactNode {
+    if (!showShares) return null;
+    const share = appShare(app);
+    const phone = !openBrowser;
+    if (!share) {
+      return shareReady && shareable(app) && !phone
+        ? <Btn theme={theme} small label="Share" onPress={() => setDialog({ kind: 'share', app })} />
+        : null;
+    }
+    return (
+      <>
+        {share.status === 'running' && !phone ? (
+          <Btn theme={theme} small label="Open shared link" onPress={() => openUrl(share.url)} />
+        ) : null}
+        {share.status === 'running' ? <Btn theme={theme} small label="Copy link" icon="Copy" onPress={() => copyLink(share.url)} /> : null}
+        {share.status === 'starting' && !phone ? <Btn theme={theme} small label="Sharing…" disabled onPress={() => undefined} /> : null}
+        {share.status !== 'starting' ? (
+          <Btn theme={theme} small kind="danger" label="Stop sharing" busy={busyKey === `unshare:${share.terminalId}`}
+            onPress={() => stopSharing(share)} />
+        ) : null}
+      </>
+    );
+  }
+
   function secondaryActions(app: App): ReactNode {
     return (
       <View style={s.actionRow}>
         <Btn theme={theme} small label="Details" onPress={() => setDialog({ kind: 'details', app })} />
         {app.source === 'managed' && app.scriptName ? (
-          <>
-            <Btn theme={theme} small label="Logs" onPress={() => setDialog({ kind: 'logs', app })} />
-            {app.status === 'running' ? (
-              <Btn theme={theme} small kind="danger" label="Stop app" onPress={() => setDialog({ kind: 'stop', app })} />
-            ) : null}
-          </>
+          <Btn theme={theme} small label="Logs" onPress={() => setDialog({ kind: 'logs', app })} />
+        ) : null}
+        {shareActions(app)}
+        {app.source === 'managed' && app.scriptName && app.status === 'running' ? (
+          <Btn theme={theme} small kind="danger" label="Stop app" onPress={() => setDialog({ kind: 'stop', app })} />
         ) : null}
       </View>
     );
@@ -227,9 +311,12 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
     const status = appStatus(app);
     const tunnel = tunnelCell(app);
     const record = tunnelMode ? tunnelByApp.get(app.id) : undefined;
-    const disconnectedDetail = record && !matchesApp(record, app)
+    const share = appShare(app);
+    const tailnet = shareCell(theme, share);
+    const tunnelDetail = record && !matchesApp(record, app)
       ? 'This tunnel targets an old port or SSH target. Disconnect it before opening the app.'
       : record?.state.status === 'disconnected' ? record.state.detail : undefined;
+    const disconnectedDetail = tunnelDetail ?? (share?.status === 'failed' ? share.detail : undefined);
     if (layout.compact) {
       return (
         <View key={app.id} style={s.card}>
@@ -242,6 +329,7 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
             <Text style={[s.mutedSmall, { color: status.color }]}>{status.text}</Text>
             <Text style={s.mutedSmall}>{app.source === 'managed' ? 'Managed' : 'Detected'}</Text>
             <Text style={[s.mutedSmall, { color: tunnel.color }]}>{tunnel.text}</Text>
+            {showShares ? <Text style={[s.mutedSmall, { color: tailnet.color }]}>{tailnet.text}</Text> : null}
           </View>
           {disconnectedDetail ? <ErrorNote theme={theme} text={disconnectedDetail} /> : null}
           <View style={s.actionRow}>{primaryActions(app)}</View>
@@ -260,6 +348,7 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
             <Text style={[s.cell, { color: status.color }]}>{status.text}</Text>
           </View>
           <Text style={[s.cell, { flex: 1.6, color: tunnel.color }]} numberOfLines={1}>{tunnel.text}</Text>
+          {showShares ? <Text style={[s.cell, { flex: 1.4, color: tailnet.color }]} numberOfLines={1}>{tailnet.text}</Text> : null}
           <View style={[s.actionRow, { flex: 2.6, justifyContent: 'flex-end' }]}>{primaryActions(app)}</View>
         </View>
         <View style={s.rowBetween}>
@@ -296,7 +385,7 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
         </View>
       ) : null}
 
-      {settings.status === 'ready' && !configured ? (
+      {settings.status === 'ready' && !configured && (openBrowser || !shareReady) ? (
         <View style={s.noticeCard}>
           <Text style={s.name}>Connect this workspace to your Mac</Text>
           <Text style={s.muted}>
@@ -318,13 +407,29 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
         </View>
       ) : null}
 
+      {availability?.ok ? (
+        <View style={s.metaRow}>
+          <Icon name="Globe" size={14} color={theme.colors.foregroundMuted} />
+          <Text selectable style={s.mutedSmall}>{`Tailnet sharing via Tailscale on ${host.label} · ${availability.dnsName}`}</Text>
+        </View>
+      ) : availability ? (
+        <Text selectable style={s.mutedSmall}>{`Tailnet sharing unavailable: ${availability.message}`}</Text>
+      ) : null}
+      {sharesQuery.isError ? (
+        <Text selectable style={[s.mutedSmall, { color: theme.colors.statusWarning }]}>
+          {`Tailnet sharing status unavailable: ${errText(sharesQuery.error)}`}
+        </Text>
+      ) : null}
+
       {tunnels.length > 0 ? (
         <Text style={s.mutedSmall}>Disconnect all tunnels below before changing connection settings.</Text>
       ) : null}
 
       {!openBrowser ? (
         <Text style={[s.mutedSmall, { color: theme.colors.statusWarning }]}>
-          Opening apps locally requires the Paseo desktop app; app controls still work here.
+          {shareReady
+            ? 'On this device, open apps through your tailnet with Share & Open. SSH tunnels require the Paseo desktop app.'
+            : 'Opening apps locally requires the Paseo desktop app; app controls still work here.'}
         </Text>
       ) : null}
       {tunnelMode && tunnelsQuery.isError ? (
@@ -359,6 +464,7 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
               <Text style={[s.headCell, { flex: 1 }]}>Source</Text>
               <Text style={[s.headCell, { flex: 1.2 }]}>App status</Text>
               <Text style={[s.headCell, { flex: 1.6 }]}>Tunnel</Text>
+              {showShares ? <Text style={[s.headCell, { flex: 1.4 }]}>Tailnet</Text> : null}
               <Text style={[s.headCell, { flex: 2.6, textAlign: 'right' }]}>Action</Text>
             </View>
           ) : null}
@@ -393,6 +499,11 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
         </View>
       ) : null}
 
+      {shares.length > 0 || foreign.length > 0 ? (
+        <ActiveSharesCard theme={theme} shares={shares} foreign={foreign} busyKey={busyKey} onStop={stopSharing}
+          appName={(appId) => apps.find((app) => app.id === appId)?.name ?? appId} />
+      ) : null}
+
       {apps.length > 0 ? (
         <Text style={s.mutedSmall}>
           Managed apps can be started and stopped here. Detected apps are matched to this workspace.
@@ -419,6 +530,10 @@ export function PortsPanel({ theme, host, layout, navigation, workspaceId }: Plu
       {dialog?.kind === 'details' ? (
         <DetailsDialog theme={theme} app={dialog.app} record={tunnelByApp.get(dialog.app.id)}
           onClose={() => setDialog(null)} />
+      ) : null}
+      {dialog?.kind === 'share' && availability?.ok ? (
+        <ShareDialog theme={theme} app={dialog.app} hostLabel={host.label} dnsName={availability.dnsName}
+          share={(httpsPort, open) => shareApp(dialog.app, httpsPort, open)} onClose={() => setDialog(null)} />
       ) : null}
       {dialog?.kind === 'stop' ? (
         <StopDialog theme={theme} app={dialog.app} hostLabel={host.label}
@@ -479,28 +594,6 @@ function ConnectDialog({ theme, app, remotePort, defaultPort, hostLabel, viewerL
         </View>
       </Modal.Content>
     </Modal>
-  );
-}
-
-function PortInput({ theme, value, onChange, disabled }: {
-  theme: PluginTheme;
-  value: string;
-  onChange: (next: string) => void;
-  disabled: boolean;
-}) {
-  return (
-    <TextInput
-      value={value}
-      onChangeText={onChange}
-      editable={!disabled}
-      keyboardType="number-pad"
-      autoCorrect={false}
-      style={{
-        borderWidth: 1, borderColor: theme.colors.border, borderRadius: 6, minWidth: 90,
-        paddingHorizontal: 10, paddingVertical: 6, fontSize: 13, textAlign: 'right',
-        color: theme.colors.foreground, backgroundColor: theme.colors.surface2,
-      }}
-    />
   );
 }
 
@@ -569,6 +662,11 @@ function DetailsDialog({ theme, app, record, onClose }: {
               .catch(() => toast.error('Could not copy. Select the text and use Copy.'));
           }} />
         ) : null}
+        {app.targetHost === '::1' ? (
+          <Text style={{ color: theme.colors.foregroundMuted, fontSize: 12, lineHeight: 17 }}>
+            Not shareable to your tailnet: Tailscale Serve proxies IPv4 loopback only.
+          </Text>
+        ) : null}
         {app.source === 'detected' ? (
           <Text style={{ color: theme.colors.foregroundMuted, fontSize: 12, lineHeight: 17 }}>
             Detected by scanning listeners on the workspace host. It is not managed by this workspace, so it
@@ -606,7 +704,7 @@ function StopDialog({ theme, app, hostLabel, stop, onClose }: {
     <Modal title={`Stop ${app.name}?`} open onOpenChange={(open) => { if (!open && !busy) onClose(); }}>
       <Modal.Content>
         <Text style={{ color: theme.colors.foregroundMuted, fontSize: 13, lineHeight: 18 }}>
-          Stops the managed script on {hostLabel}. Open tunnels are left in place and can be disconnected separately.
+          Stops the managed script on {hostLabel}. Open tunnels and tailnet shares are left in place and can be removed separately.
         </Text>
         {error ? <ErrorNote theme={theme} text={error} /> : null}
         <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'flex-end' }}>

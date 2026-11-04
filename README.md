@@ -2,21 +2,23 @@
 
 Available in the [Paseo plugin store](https://paseo.sh/plugins/maneeshv/workspace-ports).
 
-See workspace apps, open them in Paseo, and manage local SSH tunnels from a Ports panel. Workspace Ports supports same-Mac browsing and one configured pair of Macs running Paseo Desktop 0.14.x.
+See workspace apps, open them in Paseo, manage local SSH tunnels, and share apps to your tailnet from a Ports panel. Workspace Ports supports same-Mac browsing, one configured pair of Macs running Paseo Desktop 0.14.x, and tailnet-only links for opening apps on a phone.
 
 ![Workspace Ports panel with sample applications](assets/screenshot.png)
 
 - **Managed services:** start, stop, inspect logs, and Start & Open services configured in `paseo.json`.
 - **Detected listeners:** inspect and open TCP listeners associated with the workspace directory.
 - **Remote apps:** review the destination and local port, then open through an SSH tunnel on your viewing Mac.
-- **Separate controls:** disconnect a tunnel without stopping the remote app; reuse an existing tunnel when reopening.
+- **Tailnet sharing:** share a running app as a tailnet-only HTTPS link with Tailscale Serve, then open or copy it on any device in your tailnet, including a phone without SSH keys.
+- **Separate controls:** disconnect a tunnel or stop sharing without stopping the app; reuse an existing tunnel or share when reopening.
 
 ## Requirements
 
-- macOS and Paseo Desktop/daemons **0.14.x**. Other platforms and Paseo versions are not supported by this release.
+- macOS and Paseo Desktop/daemons **0.14.x or 0.15.x**. Other platforms and Paseo versions are not supported by this release. After updating Paseo, restart the daemon so it matches the app.
 - Node.js **22.13 or newer** and npm available on the installation daemon's command path. Git installation runs the manifest's locked preparation command, `npm ci --ignore-scripts`, so the builder can resolve SDK/type packages. Dependency lifecycle scripts are disabled.
 - For remote apps, both hosts connected in Paseo, a running local daemon on the viewing Mac, and working noninteractive SSH key authentication with an already trusted host key.
 - macOS system tools including OpenSSH, `lsof`, and `/usr/bin/trash`.
+- For tailnet sharing: Tailscale installed and connected on the workspace Mac, MagicDNS and HTTPS certificates enabled for the tailnet, and Tailscale signed in to the same tailnet on the device that opens the link. Checked with the Standalone macOS Tailscale variant; the App Store variant is untested.
 
 Plugins are trusted, unsandboxed code. Review [SECURITY.md](SECURITY.md) before enabling plugins on a host.
 
@@ -46,11 +48,27 @@ One pairing is saved per workspace host and shared by its authorized Paseo clien
 
 **Open** or **Start & Open** shows a confirmation with an editable local port before creating a remote tunnel. Keep the tunnel workspace active: closing the Ports panel leaves the tunnel running, while stopping its terminal or daemon ends forwarding. **Disconnect tunnel** closes only the forward. **Stop app** separately stops a configured service.
 
-Tailscale is optional. If the configured SSH target is reachable through Tailscale, forwarding can work across networks without sharing Wi-Fi. The plugin makes no Tailscale or router changes.
+Tailscale is optional for SSH forwarding. If the configured SSH target is reachable through Tailscale, forwarding can work across networks without sharing Wi-Fi. SSH forwarding makes no Tailscale or router changes.
 
 The diagram uses example aliases and a Tailscale network; SSH can also use other reachable networks.
 
 [View the architecture diagram](docs/diagrams/workspace-ports.png) · [Editable SVG](docs/diagrams/workspace-ports.svg)
+
+## Share to your tailnet
+
+Use this to open workspace apps from a phone or any device without SSH keys. Sharing doesn't need Connection settings.
+
+1. On a running app, choose **Share** (desktop) or **Share & Open** (phone).
+2. Review the link, HTTPS port, and destination, then confirm.
+3. Open the `https://<workspace-mac>.<tailnet>.ts.net:<port>` link on any device signed in to your tailnet. Use **Copy link** to send it elsewhere.
+
+The plugin on the workspace Mac runs a foreground `tailscale serve` for the app inside a Paseo terminal in the same workspace. The share lasts exactly as long as that terminal. **Stop sharing** closes it and removes the Serve mapping; it doesn't stop the app, and stopping the app doesn't remove the share. Shares don't survive a reboot or daemon restart.
+
+- Links are reachable only within your tailnet, by devices your Tailscale ACLs allow. They are never published publicly (no Funnel). Tailnet reach is not app authentication.
+- The first open on a Mac can take up to a minute while Tailscale issues its HTTPS certificate.
+- Dev servers that check hostnames may reject the link until `*.ts.net` is allowed, for example Vite's `server.allowedHosts`.
+- Only apps listening on IPv4 loopback (`127.0.0.1` or all interfaces) can be shared.
+- Serve mappings created outside this workspace are listed read-only with the command to remove them.
 
 ## Managed and detected apps
 
@@ -63,8 +81,8 @@ Detected listeners are found from TCP sockets and canonical process working dire
 - Automatic process discovery is macOS-only. Docker/container discovery is not included.
 - Forwarding binds to `127.0.0.1` on the viewer and targets loopback on the workspace host. It does not change the remote app's own exposure or authentication.
 - Existing tunnels use private SSH control sockets, separate from unrelated SSH sessions. Other local applications can still access a loopback port.
-- Phone-local forwarding, public sharing, startup services, and automatic reconnection are not included. After a lost connection, disconnect the old tunnel and reopen.
-- Settings contain host/workspace identifiers and the SSH target, not credentials. Process details and requested service logs are returned through Paseo to the client; browser traffic goes through the chosen SSH connection to the app. This plugin adds no analytics or model-provider calls.
+- Phone-local SSH forwarding, public sharing (Tailscale Funnel), persistent shares, startup services, and automatic reconnection are not included. After a lost connection, disconnect the old tunnel and reopen.
+- Settings contain host/workspace identifiers and the SSH target, not credentials. The workspace Mac's tailnet DNS name is read live from Tailscale for share links and is not stored. Process details and requested service logs are returned through Paseo to the client; browser traffic goes through the chosen SSH connection to the app. This plugin adds no analytics or model-provider calls.
 - The plugin installs no software during normal activation, discovery, or tunnel creation. Git acquisition and its declared dependency preparation happen during installation.
 
 ## Development and project policies

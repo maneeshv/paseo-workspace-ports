@@ -1,7 +1,7 @@
 {
   "name": "paseo-workspace-ports",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "files": [
     "paseo-plugin.json",
     "OVERVIEW.md",
@@ -22,16 +22,16 @@
     "test": "node --import tsx --test tests/*.test.ts"
   },
   "devDependencies": {
-    "@getpaseo/plugin": "0.14.0",
+    "@getpaseo/client": "0.15.0",
+    "@getpaseo/plugin": "0.15.0",
     "@tanstack/react-query": "^5.90.11",
+    "@types/node": "^22.0.0",
     "@types/react": "~19.2.0",
     "react": "19.2.3",
     "react-native": "0.86.3",
+    "tsx": "^4.20.0",
     "typescript": "^5.9.3",
-    "zod": "^4.4.3",
-    "@getpaseo/client": "0.14.0",
-    "@types/node": "^22.0.0",
-    "tsx": "^4.20.0"
+    "zod": "^4.4.3"
   },
   "type": "module",
   "description": "Workspace apps and local SSH forwarding for Paseo Desktop",
@@ -41,7 +41,8 @@
     "#shared/*": "./shared/*.ts",
     "#client/panel": "./client/panel.tsx",
     "#client/setup": "./client/setup.tsx",
-    "#client/components": "./client/components.tsx"
+    "#client/components": "./client/components.tsx",
+    "#client/share": "./client/share.tsx"
   },
   "license": "MIT",
   "author": "Maneesh (maneeshv)",

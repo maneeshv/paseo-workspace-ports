@@ -1,6 +1,7 @@
 import type { PluginServerContext } from '@getpaseo/plugin/server';
 import { appLogs, controlApp, listApps } from '#server/apps';
-import { appLogsRpc, controlAppRpc, listAppsRpc, pairing } from '#shared/contracts';
+import { listShares, startShare, stopShare } from '#server/share';
+import { appLogsRpc, controlAppRpc, listAppsRpc, listSharesRpc, pairing, startShareRpc, stopShareRpc } from '#shared/contracts';
 
 export default function contribute(server: PluginServerContext) {
   server.registerSettings(pairing);
@@ -12,5 +13,13 @@ export default function contribute(server: PluginServerContext) {
   server.handle(appLogsRpc, async ({ workspaceId, scriptName }, { paseo }) => ({
     text: await appLogs(paseo, workspaceId, scriptName),
   }));
+  server.handle(listSharesRpc, ({ workspaceId }, { paseo }) => listShares(paseo, workspaceId));
+  server.handle(startShareRpc, async ({ workspaceId, appId, httpsPort }, { paseo }) => ({
+    share: await startShare(paseo, workspaceId, appId, httpsPort),
+  }));
+  server.handle(stopShareRpc, async ({ workspaceId, terminalId }, { paseo }) => {
+    await stopShare(paseo, workspaceId, terminalId);
+    return { ok: true as const };
+  });
   return () => {};
 }
