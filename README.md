@@ -2,7 +2,7 @@
 
 Available in the [Paseo plugin store](https://paseo.sh/plugins/maneeshv/workspace-ports).
 
-See workspace apps, open them in Paseo, manage local SSH tunnels, and share apps to your tailnet from a Ports panel. Workspace Ports supports same-Mac browsing, one configured pair of Macs running Paseo Desktop 0.14.x, and tailnet-only links for opening apps on a phone.
+See workspace apps, open them in Paseo, manage local SSH tunnels, and share apps to your tailnet from a Ports panel. Workspace Ports supports same-Mac browsing, one configured pair of Macs running Paseo Desktop, and tailnet-only links for opening apps on a phone.
 
 ![Workspace Ports panel with sample applications](assets/screenshot.png)
 
@@ -14,7 +14,7 @@ See workspace apps, open them in Paseo, manage local SSH tunnels, and share apps
 
 ## Requirements
 
-- macOS and Paseo Desktop/daemons **0.14.x or 0.15.x**. Other platforms and Paseo versions are not supported by this release. After updating Paseo, restart the daemon so it matches the app.
+- macOS and Paseo Desktop/daemons **0.14.0 or newer**. Other platforms are unsupported. The manifest has no upper version bound; this is not a guarantee for every future release. See the [verification record](docs/verification.md) for exact SDK checks and historical runtime coverage. Keep the app and daemons on matching versions.
 - Node.js **22.13 or newer** and npm available on the installation daemon's command path. Git installation runs the manifest's locked preparation command, `npm ci --ignore-scripts`, so the builder can resolve SDK/type packages. Dependency lifecycle scripts are disabled.
 - For remote apps, both hosts connected in Paseo, a running local daemon on the viewing Mac, and working noninteractive SSH key authentication with an already trusted host key.
 - macOS system tools including OpenSSH, `lsof`, and `/usr/bin/trash`.

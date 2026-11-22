@@ -57,7 +57,7 @@ Design and evidence: [docs/specs/tailnet-sharing.md](specs/tailnet-sharing.md).
 
 ## Paseo 0.15 compatibility (Workspace Ports 0.2.0)
 
-The manifest range is `>=0.14.0 <0.16.0`.
+The checks in this section were recorded with the former manifest range `>=0.14.0 <0.16.0`. They are historical results, not checks rerun for the minimum-only policy below.
 - **0.14.0:** the earlier default and live checks above passed.
 - **0.15.0** (2026-11-04):
   - Type checking passed against `@getpaseo/plugin` and `@getpaseo/client` 0.15.0.
@@ -69,6 +69,22 @@ The manifest range is `>=0.14.0 <0.16.0`.
 Not yet established for tailnet sharing:
 - The panel UI has not been inspected in a Paseo client on desktop (wide or compact) or on a phone. A bundled web client could not connect to the local daemon directly.
 - No phone on another network (V9), no tailnet with HTTPS certificates disabled (V4), and no App Store Tailscale variant have been checked.
+
+## Minimum-only admission (2026-11-22)
+
+The supported manifest range is now `>=0.14.0`, retaining the existing minimum and removing the arbitrary minor-version ceiling. This follows [Paseo's requirements policy](https://paseo.sh/docs/plugins/reference.md#requirements): a ceiling should reflect an actual incompatibility. Admission is separate from tested coverage; future breaking releases can still require fixes or a documented upper bound.
+
+Checks in an isolated worktree, with no live daemon or desktop operations:
+
+- `npm ci --ignore-scripts`, `npm run typecheck`, and `npm test` passed with the committed 0.15.0 SDK dependencies: 35 passed, two opt-in live cases skipped. The first sandboxed test attempt failed during macOS Trash cleanup; the same fixture suite passed with the required filesystem access.
+- Full-source typechecking also passed with both `@getpaseo/plugin` and `@getpaseo/client` temporarily substituted at **0.14.0** and **0.17.2**. Their matching protocol dependencies were resolved by npm. The package manifest and lockfile remain pinned to 0.15.0.
+- At each of 0.14.0 and 0.17.2, `node --import tsx --test tests/server.test.ts tests/tunnels.test.ts` passed all 21 fixture tests. Coverage includes service output parsing/rejection, action-result validation, CLI arguments and inherited host routing, tunnel identity/ownership, and fake-SSH lifecycle cleanup. These are synthetic contracts, not captured output from a newer running CLI.
+- Inspected the published 0.14.0 and 0.17.2 SDK declarations for `useHosts`, `getPaseoClient`, `openExternalUrl`, and optional `navigation.openBrowser`. Existing calls compile at both versions; no API migration or floor increase was indicated.
+- Semver assertions verified admission of 0.14.0, 0.15.0, 0.16.0, 0.17.2, and 1.0.0, and rejection of 0.13.9. This verifies only the gate.
+
+To reproduce the extra SDK checks in a disposable checkout, run `npm install --ignore-scripts --no-save --package-lock=false @getpaseo/plugin@VERSION @getpaseo/client@VERSION`, then the typecheck and focused test commands above, for VERSION 0.14.0 and 0.17.2. Restore locked dependencies with `npm ci --ignore-scripts` afterward.
+
+No new live runtime acceptance is claimed. Newer CLI output, actual host/browser routing, real SSH forwarding, Tailscale sharing, desktop layouts, and phone behavior remain unverified by this change. The earlier 0.14.0/0.15.0 live results above remain historical evidence only.
 
 ## Reproduction
 
